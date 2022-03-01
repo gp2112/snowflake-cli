@@ -92,6 +92,7 @@ async def main():
 
                 if 'IP4' in msg or 'IP6' in msg:
                     peers_connected += 1
+                    # run parsePeer on another thread for ip location request and peer database store
                     await asyncio.to_thread(parsePeer, msg, save=save_data, get_loc=get_loc)
 
             # shows you each 10min how many people have conected with you
