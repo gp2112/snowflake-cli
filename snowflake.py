@@ -10,7 +10,7 @@ import os
 import sys
 import asyncio
 
-def logPeerIp(log: str):
+def logPeerIp(log: str) -> str:
     l = log.replace('\n', ' ').split()[10:]
     ip, port = None, None
     if 'IP6' in l:
@@ -21,7 +21,7 @@ def logPeerIp(log: str):
 
     return ip
 
-def getPeerData(ip):
+def getPeerLocation(ip: str) -> dict:
     r = requests.get(f'http://ip-api.com/json/{ip}?fields=16393')
     if r.status_code != 200:
         return {}
@@ -32,17 +32,20 @@ def getPeerData(ip):
 
     return r.json()
 
-def parsePeer(msg, save=False):
+def parsePeer(msg: str, save=True, get_loc=True):
     ip = logPeerIp(msg)
-    p_data = getPeerData(ip)
-    print(f"{ip} from {p_data.get('region')}/{p_data.get('country')} is conected to you")
+    p_loc = getPeerLocation(ip) if get_loc else {}
+
+    print(f"{ip} from {p_loc.get('region')}-{p_loc.get('country')} is conected to you")
     if save:
         statsdb.savePeer(timestmp, ip, p_data.get('country'), p_data.get('region'))
-    return 0
+
 
 async def main():
 
-    save_data = '--no-persist' not in sys.argv
+    save_data = '--no-persist' not in sys.argv #saves peer's data in database
+    get_loc = '--no-location' not in sys.argv # check peer's location using ip-api.com
+
     if save_data: import statsdb
 
     started_time = time.time()
@@ -89,8 +92,9 @@ async def main():
 
                 if 'IP4' in msg or 'IP6' in msg:
                     peers_connected += 1
-                    await asyncio.to_thread(parsePeer, msg, save=save_data)
+                    await asyncio.to_thread(parsePeer, msg, save=save_data, get_loc=get_loc)
 
+            # shows you each 10min how many people have conected with you
             if (current_time-started_time)%600==0:
                 print(f'\nYou have helped {peers_connected} people :)\n')
 
