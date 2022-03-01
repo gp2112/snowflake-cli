@@ -11,4 +11,4 @@ Now, with this script, you can host on a server too, without the need to use a b
 
 - Google Chrome 98
 - [Chromedriver](https://chromedriver.storage.googleapis.com/index.html?path=98.0.4758.102/)
-- Add Chromedriver to path
+- Add Chromedriver to path (or to /usr/bin on linux)
