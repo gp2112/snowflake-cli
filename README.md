@@ -13,18 +13,6 @@ Now, with this script, you can host a snowflake relay in another program or run 
 - [Chromedriver](https://chromedriver.storage.googleapis.com/index.html?path=98.0.4758.102/)
 - Add Chromedriver to path (or to /usr/bin on linux)
 
-## Running (cli mode)
-
-` $ python snowflake.py `
-
-### Options: 
-```
---just-run   - Just run snowflake with all options below
---no-persist - Run without storing peer's data
---no-location - Doesn't get IPs locations
---no-logging  - Doesn't print anything (just the starting log)
-```
-
 ## Running snowflake in your program:
 
 It's possible to import snowflake in your program's python code to host snowflake cuncurrently!
@@ -43,6 +31,18 @@ options = {
 # runs snowflake concurrently in another thread while your main program runs
 snowflake.start_run(options) 
 
+```
+
+## Running (cli mode)
+
+` $ python snowflake.py `
+
+### Options: 
+```
+--just-run   - Just run snowflake with all options below
+--no-persist - Run without storing peer's data
+--no-location - Doesn't get IPs locations
+--no-logging  - Doesn't print anything (just the starting log)
 ```
 ## Features
 
