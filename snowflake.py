@@ -9,6 +9,7 @@ import time
 import os
 import sys
 import asyncio
+import statsdb
 
 def logPeerIp(log: str) -> str:
     l = log.replace('\n', ' ').split()[10:]
@@ -32,11 +33,11 @@ def getPeerLocation(ip: str) -> dict:
 
     return r.json()
 
-def parsePeer(msg: str, save=True, get_loc=True):
+def parsePeer(timestmp: int, msg: str, save=True, get_loc=True):
     ip = logPeerIp(msg)
     p_loc = getPeerLocation(ip) if get_loc else {}
 
-    print(f"{ip} from {p_loc.get('region')}-{p_loc.get('country')} is conected to you")
+    print(f"\r{ip} from {p_loc.get('region')}-{p_loc.get('country')} is conected to you")
     if save:
         statsdb.savePeer(timestmp, ip, p_data.get('country'), p_data.get('region'))
 
@@ -45,8 +46,6 @@ async def main():
 
     save_data = '--no-persist' not in sys.argv #saves peer's data in database
     get_loc = '--no-location' not in sys.argv # check peer's location using ip-api.com
-
-    if save_data: import statsdb
 
     started_time = time.time()
 
@@ -88,22 +87,24 @@ async def main():
                 date = datetime.fromtimestamp(timestmp).strftime('%Y-%m-%d %H:%M:%S')
                 msg = entry['message'].split('"')[1].replace('\\r\\n', f'\n{date}')
 
-                print(f'{date} - {msg}')
+                print(f'\r{date} - {msg}')
 
                 if 'IP4' in msg or 'IP6' in msg:
                     peers_connected += 1
                     # run parsePeer on another thread for ip location request and peer database store
-                    await asyncio.to_thread(parsePeer, msg, save=save_data, get_loc=get_loc)
+                    await asyncio.to_thread(parsePeer, timestmp, msg, save=save_data, get_loc=get_loc)
+
 
             # shows you each 10min how many people have conected with you
             if (current_time-started_time)%600==0:
                 print(f'\nYou have helped {peers_connected} people :)\n')
 
         except KeyboardInterrupt:
-            print('\rclosing...')
-            time.sleep(3)
-            driver.quit()
             break
+
+    print('\rclosing...')
+    time.sleep(3)
+    driver.quit()
 
     if peers_connected > 0:
         p = 'people' if peers_connected>1 else 'person'
