@@ -39,7 +39,7 @@ def parsePeer(timestmp: int, msg: str, save=True, get_loc=True):
 
     print(f"\r{ip} from {p_loc.get('region')}-{p_loc.get('country')} is conected to you")
     if save:
-        statsdb.savePeer(timestmp, ip, p_data.get('country'), p_data.get('region'))
+        statsdb.savePeer(timestmp, ip, p_loc.get('country'), p_loc.get('region'))
 
 
 async def main():
