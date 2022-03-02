@@ -3,7 +3,7 @@ Snowflake is a system to defeat internet censorship, made by [Tor Project](https
 
 The system works by volunteers who run the snowflake extension on browser.
 
-Now, with this script, you can host on a server too, without the need to use a browser with GUI and install an extension.
+Now, with this script, you can host a snowflake relay in another program or run it in CLI mode in a server!
 
 ## Requirements
 
@@ -13,7 +13,7 @@ Now, with this script, you can host on a server too, without the need to use a b
 - [Chromedriver](https://chromedriver.storage.googleapis.com/index.html?path=98.0.4758.102/)
 - Add Chromedriver to path (or to /usr/bin on linux)
 
-## Running
+## Running (cli mode)
 
 ` $ python snowflake.py `
 
@@ -23,6 +23,25 @@ Now, with this script, you can host on a server too, without the need to use a b
 --no-location - Doesn't get IPs locations
 ```
 
+## Using snowflake in your program:
+
+It's possible to import snowflake in your program's python code to host snowflake cuncurrently!
+This is very nice because you can allow users of your software to donate their bandwidth to snowflake's network :)
+
+```python
+import snowflake
+
+options = {
+  'just_run':False, # if true, runs snowflake discretly - without logging and saving data
+  'save_data':True, # if true, snowflake will save your peers data in database
+  'get_loc':True,   # if true, snowflake will not get peers country and region
+  'log':True        # if true, snowflake will print every log
+}
+
+# runs snowflake concurrently in another thread while your main program runs
+snowflake.start_run(options) 
+
+```
 ## Features
 
 You can watch all peers that conects with you live, store this data with the peer's location to further analisys.
