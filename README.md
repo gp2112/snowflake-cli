@@ -18,12 +18,14 @@ Now, with this script, you can host a snowflake relay in another program or run 
 ` $ python snowflake.py `
 
 ### Options: 
-```options
+```
+--just-run   - Just run snowflake with all options below
 --no-persist - Run without storing peer's data
 --no-location - Doesn't get IPs locations
+--no-logging  - Doesn't print anything (just the starting log)
 ```
 
-## Using snowflake in your program:
+## Running snowflake in your program:
 
 It's possible to import snowflake in your program's python code to host snowflake cuncurrently!
 This is very nice because you can allow users of your software to donate their bandwidth to snowflake's network :)
