@@ -8,8 +8,8 @@ import requests
 import time
 import os
 import sys
-import asyncio
 import statsdb
+import _thread
 
 def logPeerIp(log: str) -> str:
     l = log.replace('\n', ' ').split()[10:]
@@ -33,28 +33,25 @@ def getPeerLocation(ip: str) -> dict:
 
     return r.json()
 
-def parsePeer(timestmp: int, msg: str, save=True, get_loc=True):
+def parsePeer(timestmp: int, msg: str, save_data=True, get_loc=True, just_run=False, log=True):
     ip = logPeerIp(msg)
     p_loc = getPeerLocation(ip) if get_loc else {}
 
-    print(f"\r{ip} from {p_loc.get('region')}-{p_loc.get('country')} is conected to you")
-    if save:
+    if log: print(f"\r{ip} from {p_loc.get('region')}-{p_loc.get('country')} is conected to you")
+    if save_data:
         statsdb.savePeer(timestmp, ip, p_loc.get('country'), p_loc.get('region'))
 
 
-async def main():
-
-    save_data = '--no-persist' not in sys.argv #saves peer's data in database
-    get_loc = '--no-location' not in sys.argv # check peer's location using ip-api.com
+def run(**op):
 
     started_time = time.time()
 
-    print('Starting snowflake...')
+    if op['log']: print('Starting snowflake...')
 
-    if save_data and not os.path.isfile(statsdb.db_name):
-        print('Creating database...')
+    if op['save_data'] and not os.path.isfile(statsdb.db_name):
+        if op['log']: print('Creating database...')
         statsdb.createDb()
-        print(f'{statsdb.db_name} created!')
+        if op['log']: print(f'{statsdb.db_name} created!')
 
     options = Options()
     options.add_argument('--headless')
@@ -71,7 +68,7 @@ async def main():
         try:
             button = driver.find_element(by=By.CLASS_NAME, value='slider')
             button.click()
-            print('connected!')
+            if op['log']: print('connected!')
             break
         except ElementNotInteractableException:
             pass
@@ -80,6 +77,8 @@ async def main():
 
     while True:
         try:
+            if op['just_run']:
+                continue
             current_time = time.time()
 
             for entry in driver.get_log('browser'):
@@ -87,28 +86,38 @@ async def main():
                 date = datetime.fromtimestamp(timestmp).strftime('%Y-%m-%d %H:%M:%S')
                 msg = entry['message'].split('"')[1].replace('\\r\\n', f'\n{date}')
 
-                print(f'\r{date} - {msg}')
+                if op['log']: print(f'\r{date} - {msg}')
 
                 if 'IP4' in msg or 'IP6' in msg:
                     peers_connected += 1
                     # run parsePeer on another thread for ip location request and peer database store
-                    await asyncio.to_thread(parsePeer, timestmp, msg, save=save_data, get_loc=get_loc)
+                    _thread.start_new_thread(parsePeer, (timestmp, msg), op)
 
 
             # shows you each 10min how many people have conected with you
-            if (current_time-started_time)%600==0:
+            if op['log'] and (current_time-started_time)%600==0:
                 print(f'\nYou have helped {peers_connected} people :)\n')
 
         except KeyboardInterrupt:
             break
 
-    print('\rclosing...')
+    if op['log']: print('\rclosing...')
     time.sleep(3)
     driver.quit()
 
     if peers_connected > 0:
         p = 'people' if peers_connected>1 else 'person'
-        print(f'You have helped {peers_connected} {p}!')
+        if not op['log']: print(f'You have helped {peers_connected} {p}!')
+
+
+def start_run(op):
+    _thread.start_new_thread(run, (), op)
+
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    op = {}
+    op['just_run'] = '--just-run' in sys.argv
+    op['save_data'] = not op['just_run'] and '--no-persist' not in sys.argv #saves peer's data in database
+    op['get_loc'] = not op['just_run'] and '--no-location' not in sys.argv # check peer's location using ip-api.com
+    op['log'] = not op['just_run'] and '--no-logging' not in sys.argv
+    run(**op)
