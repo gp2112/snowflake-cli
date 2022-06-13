@@ -7,9 +7,10 @@ from datetime import datetime
 import requests
 import time
 import os
-import sys
 import statsdb
 import _thread
+
+__version__ = '0.1.0'
 
 def logPeerIp(log: str) -> str:
     l = log.replace('\n', ' ').split()[10:]
@@ -113,11 +114,3 @@ def run(**op):
 def start_run(op):
     _thread.start_new_thread(run, (), op)
 
-
-if __name__ == '__main__':
-    op = {}
-    op['just_run'] = '--just-run' in sys.argv
-    op['save_data'] = not op['just_run'] and '--no-persist' not in sys.argv #saves peer's data in database
-    op['get_loc'] = not op['just_run'] and '--no-location' not in sys.argv # check peer's location using ip-api.com
-    op['log'] = not op['just_run'] and '--no-logging' not in sys.argv
-    run(**op)
