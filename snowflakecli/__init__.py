@@ -7,7 +7,7 @@ from datetime import datetime
 import requests
 import time
 import os
-import statsdb
+import snowflakecli.statsdb
 import _thread
 
 __version__ = '0.1.0'

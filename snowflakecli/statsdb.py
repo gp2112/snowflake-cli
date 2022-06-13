@@ -1,7 +1,12 @@
 from datetime import datetime
+import sys
 import sqlite3
 
-db_name = 'stats.db'
+
+if sys.platform == 'linux':
+    db_name = '/tmp/stats.db'
+else:
+    db_name = 'stats.db'  
 
 def createDb():
     with sqlite3.connect(db_name) as con:
