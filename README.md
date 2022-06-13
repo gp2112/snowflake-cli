@@ -7,11 +7,16 @@ Now, with this script, you can host a snowflake relay in another program or run 
 
 ## Requirements
 
-` pip install -r requirements.txt `
-
 - Google Chrome 98
 - [Chromedriver](https://chromedriver.storage.googleapis.com/index.html?path=98.0.4758.102/)
 - Add Chromedriver to path (or to /usr/bin on linux)
+
+## Install
+
+```bash
+cd snowflake-cli
+pip install .
+```
 
 ## Running snowflake in your program:
 
@@ -19,7 +24,7 @@ It's possible to import snowflake in your program's python code to host snowflak
 This is very nice because you can allow users of your software to donate their bandwidth to snowflake's network :)
 
 ```python
-import snowflake
+import snowflakecli
 
 options = {
   'just_run':False, # if true, runs snowflake discretly - without logging and saving data
@@ -29,13 +34,13 @@ options = {
 }
 
 # runs snowflake concurrently in another thread while your main program runs
-snowflake.start_run(options) 
+snowflakecli.start_run(options) 
 
 ```
 
 ## Running (cli mode)
 
-` $ python snowflake.py `
+` $ snowflakecli [OPTIONS]`
 
 ### Options: 
 ```
