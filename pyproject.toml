@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "snowflakecli"
 version = "0.0.1"
-description = ""
+description = "A simple python script for hosting a Snowflake Proxy in your python program or with it's standalone cli."
 authors = ["gp2112 <me@guip.dev>"]
 
 [tool.poetry.dependencies]
